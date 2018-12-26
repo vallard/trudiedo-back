@@ -17,3 +17,13 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${TRUDB_PW}
+  trudo-bak:
+    image: vallard/trudo-bak
+    restart: always
+    ports: 
+      - 5011:5000
+    environment:
+      MONGODB_HOST: mongo
+      MONGODB_PORT: 27017
+      MONGODB_USER: root
+      TRUDB_PW: ${TRUDB_PW}

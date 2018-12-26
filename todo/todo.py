@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
 import pymongo
 import json
+import sys
 import time, os
 import urllib.parse
 from bson.json_util import dumps as bdumps
@@ -9,12 +10,21 @@ from bson.objectid import ObjectId
 
 todo = Blueprint("todo", __name__)
 
-MONGODB_HOST = "127.0.0.1"
-MONGODB_PORT = 27017
+MONGODB_HOST = os.environ.get('MONGODB_HOST')
+MONGODB_PORT = os.environ.get('MONGODB_PORT')
 MONGODB_NAME = "trudiedo"
 MONGODB_COLLECTION = "todos"
-MONGODB_USER = "root"
-MONGODB_PASSWORD = os.environ['TRUDB_PW']
+MONGODB_USER = os.environ.get('TRUDB_USER') or "root"
+MONGODB_PASSWORD = os.environ.get('TRUDB_PW')
+
+if type(MONGODB_PASSWORD) == None:
+    print("Environment TRUDB_PW is not defined.") 
+    sys.exit(1) 
+
+
+if type(MONGODB_HOST) == None:
+    print("Environment MONGODB_HOST is not defined.") 
+    sys.exit(1) 
 
 class Todo(object):
     client = ""
@@ -24,6 +34,7 @@ class Todo(object):
         try:
             username = urllib.parse.quote_plus(MONGODB_USER)
             password = urllib.parse.quote_plus(MONGODB_PASSWORD)
+            print("Connecting: ", MONGODB_HOST, MONGODB_PORT)
             self.client = pymongo.MongoClient("mongodb://{0}:{1}@{2}".format(username, password, MONGODB_HOST), int(MONGODB_PORT))
             self.collection = self.client[MONGODB_NAME][MONGODB_COLLECTION]
             
